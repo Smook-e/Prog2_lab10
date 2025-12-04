@@ -4,13 +4,13 @@ public enum DifficultyLevel {
     MEDIUM("medium", 15),
     HARD("hard", 20);
     
-    private String fileName;
+    private String folderName;
     private int cellsToRemove;
     
-    DifficultyLevel(String fileName, int cellsToRemove) {
-        this.fileName = fileName;
+    DifficultyLevel(String folderName, int cellsToRemove) {
+        this.folderName = folderName;
         this.cellsToRemove = cellsToRemove;
     }
-    public String getfileName() { return fileName; }
-    public int getcellsToRemove() { return cellsToRemove; }
+    public String getfolderName() { return folderName; }
+    public int getCellsToRemove() { return cellsToRemove; }
 }
