@@ -1,5 +1,4 @@
 package solver;
-// Digit.java
 public final class Digit {
     private final int value;
 
