@@ -22,14 +22,16 @@ public class FileManager {
                 board[i][j] = Integer.parseInt(values[j]);
             }
         }
-        reader.close();
-        
+        reader.close(); 
         return board;
     }
     public static boolean exists(String folder) {
         return new File(folder + "/game.txt").exists();
     }
     public static void delete(String folder) {
-        new File(folder + "/game.txt").delete();
+        if(exists(folder))
+        {          
+            new File(folder + "/game.txt").delete();
+        }
     }
 }
