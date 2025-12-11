@@ -1,12 +1,13 @@
 package storageManager;
 import java.io.*;
+import javaapplication19.SudokuBoard;
 public class FileManager {
     public static void saveBoard(String folder, SudokuBoard board) throws IOException {
         new File(folder).mkdirs();    
         BufferedWriter writer = new BufferedWriter(new FileWriter(folder + "/game.txt"));
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                writer.write(SudokuBoard.getGrid()[i][j]+ " ");//getGrid for return int[][]
+                writer.write(board.getGrid()[i][j]+ " ");//getGrid for return int[][]
             }
             writer.newLine();
         }

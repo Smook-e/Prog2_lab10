@@ -2,6 +2,7 @@ package difficultyManager;
 
 import java.util.List;
 import model.DifficultyLevel;
+import javaapplication19.SudokuBoard;
 
 public class DifficultyGenerator {
     private final RandomPairs randomPairs = new RandomPairs();
@@ -17,8 +18,8 @@ public class DifficultyGenerator {
        }
        return sb;
     }
-    public void generate(SudokuBoard solved,DifficultyLevel df)
+    public  SudokuBoard generate(SudokuBoard solved,DifficultyLevel df)
     {
-        removeCells(solved,df);
+        return removeCells(solved,df);
     }
 }

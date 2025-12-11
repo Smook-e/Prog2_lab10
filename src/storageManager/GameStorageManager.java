@@ -2,8 +2,9 @@ package storageManager;
 
 import java.io.IOException;
 import model.DifficultyLevel;
+import javaapplication19.SudokuBoard;
 
-public class GameStorgeManager {
+public class GameStorageManager {
 
     public void saveGame(DifficultyLevel level, SudokuBoard board) {
         try {
@@ -24,11 +25,7 @@ public class GameStorgeManager {
     }
 
     public void deleteGame(DifficultyLevel level) {
-        try {
-            FileManager.delete(level.getfolderName());
-        } catch (IOException ex) {
-            System.out.println("error deleting game");
-        }
+        FileManager.delete(level.getfolderName());
     }
 
     public void saveCurrentGame(SudokuBoard board) {
