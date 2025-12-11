@@ -19,6 +19,7 @@ public class GameStorgeManager {
             return FileManager.loadBoard(level.getfolderName());
         } catch (IOException ex) {
             System.out.println("error loading game");
+            return null;
         }
     }
 
@@ -38,15 +39,16 @@ public class GameStorgeManager {
         }
     }
 
-    public void loadCurrentGame() {
+    public SudokuBoard loadCurrentGame() {
         try {
-            FileManager.loadBoard("current");
+            return FileManager.loadBoard("current");
         } catch (IOException ex) {
             System.out.println("error loading game");
+            return null;
         }
     }
 
-    public void hasCurrentGame() {
-        FileManager.exists("current");
+    public boolean hasCurrentGame() {
+        return FileManager.exists("current");
     }
 }

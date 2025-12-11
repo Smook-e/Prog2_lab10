@@ -5,7 +5,7 @@ import model.DifficultyLevel;
 
 public class DifficultyGenerator {
     private final RandomPairs randomPairs = new RandomPairs();
-    public void removeCells(SudokuBoard solved,DifficultyLevel df)
+    public SudokuBoard removeCells(SudokuBoard solved,DifficultyLevel df)
     {
        SudokuBoard sb = solved.newBoard();//new ref
        List<int[]>pairs = randomPairs.generateDistinctPairs(df.getCellsToRemove());
