@@ -41,6 +41,10 @@ public class SudokuBoard {
         grid[entry.row][entry.col] = entry.value;
       return entry;
     }
+    public SudokuBoard newBoard(){
+        SudokuBoard board = new SudokuBoard(grid);
+        return board;
+    }
     public int getGrid(int row, int col) {
         return grid[row][col];
     }
@@ -51,4 +55,3 @@ public class SudokuBoard {
         grid[row][col] = 0;
     }
 }
-
