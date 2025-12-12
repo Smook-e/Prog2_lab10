@@ -1,4 +1,6 @@
 package solver;
+import model.SudokuBoard;
+
 import java.util.List;
 
 public class SudokuSolver {
