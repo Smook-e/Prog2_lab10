@@ -1,6 +1,8 @@
 package storageManager;
-import java.io.*;
 import model.SudokuBoard;
+
+import java.io.*;
+
 public class FileManager {
     public static void saveBoard(String folder, SudokuBoard board) throws IOException {
         new File(folder).mkdirs();
