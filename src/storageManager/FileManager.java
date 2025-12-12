@@ -13,17 +13,31 @@ public class FileManager {
         }
         writer.close();
     }
-    public static SudokuBoard loadBoard(String folder) throws IOException {
-        int[][] board = new int[9][9];
-        BufferedReader reader = new BufferedReader(new FileReader(folder + "/game.txt"));
-        for (int i = 0; i < 9; i++) {
-            String[] values = reader.readLine().trim().split("\\s+");
-            for (int j = 0; j < 9; j++) {
-                board[i][j] = Integer.parseInt(values[j]);
+    public static int[][] loadBoard(File file) throws IOException {
+        int[][] grid = new int[9][9];
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            for (int i = 0; i < 9; i++) {
+                String line = br.readLine();
+
+                String[] values = line.split(",");
+
+                for (int j = 0; j < 9; j++) {
+                    String val = values[j].trim();
+                    if (val.isEmpty() || val.equals("0")) {
+                        grid[i][j] = 0;
+                    } else {
+                        int num = Integer.parseInt(val);
+
+                        grid[i][j] = num;
+                    }
+                }
             }
+            // Check for extra lines
+
+        } catch (NumberFormatException e) {
+            throw new IOException("Invalid number format in file: " + e.getMessage());
         }
-        reader.close(); 
-        return new SudokuBoard(board);//constructor for SudokuBoard
+        return grid;
     }
     public static boolean exists(String folder) {
         return new File(folder + "/game.txt").exists();
