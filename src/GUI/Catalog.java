@@ -9,5 +9,6 @@ package GUI;
  * @author HP
  */
 public class Catalog {
-    
+    public boolean current; // true if there is a game to continue
+    public boolean allModesExist; // true if there is three dificulity levels
 }
