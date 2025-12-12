@@ -13,12 +13,12 @@ public class SudokuGUI {
     private JFrame frame;
     private JTextField[][] cells;
     private boolean[][] isGiven;
-    private int[][] puzzle;
+    private SudokuBoard puzzle;
 
     public SudokuGUI() {
         cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
-        puzzle = new int[9][9];
+        puzzle = new SudokuBoard(new int[9][9]);
         initializeGUI();
         resetPuzzle();
     }
@@ -64,7 +64,7 @@ public class SudokuGUI {
                                 char c = e.getKeyChar();
                                 if (!Character.isDigit(c) || c == '0') {
                                     e.consume();
-                                } else if (cells[row][col].getText().length() >= 1) {
+                                } else if (!cells[row][col].getText().isEmpty()) {
                                     e.consume(); // Replace mode
                                 }
                             }
@@ -74,12 +74,14 @@ public class SudokuGUI {
                                                                                   String text = cells[row][col].getText().trim();
                                                                                   System.out.println(text);
                                                                                   if (text.isEmpty()) {
-                                                                                      puzzle[row][col] = 0;
+                                                                                      puzzle.setDigit(row, col, 0);
+
                                                                                   } else {
                                                                                       try {
-                                                                                          puzzle[row][col] = Integer.parseInt(text);
+                                                                                          puzzle.setDigit(row, col, Integer.parseInt(text));
+
                                                                                       } catch (NumberFormatException ex) {
-                                                                                          puzzle[row][col] = 0; // safety
+                                                                                          puzzle.setDigit(row, col, 0); // safety
                                                                                       }
                                                                                   }
                                                                                   autoSave();
@@ -113,6 +115,9 @@ public class SudokuGUI {
         JButton loadBtn = new JButton("Load from CSV");
         loadBtn.addActionListener(e -> loadPuzzleFromFile());
 
+        JButton undoBtn = new JButton("Undo");
+        undoBtn.addActionListener(e -> undo());
+
         JButton saveBtn = new JButton("Save to CSV");
         saveBtn.addActionListener(e -> savePuzzleToFile());
 
@@ -125,6 +130,7 @@ public class SudokuGUI {
         JButton clearBtn = new JButton("Clear User Entries");
         clearBtn.addActionListener(e -> clearUserEntries());
 
+        panel.add(undoBtn);
         panel.add(loadBtn);
         panel.add(saveBtn);
         panel.add(solveBtn);
@@ -136,7 +142,7 @@ public class SudokuGUI {
 
     private void resetPuzzle() {
         for (int i = 0; i < 9; i++) {
-            Arrays.fill(puzzle[i], 0);
+            Arrays.fill(puzzle.getArray()[i], 0);
             Arrays.fill(isGiven[i], false);
         }
         if (cells != null) { // Safe if called after cells initialized
@@ -149,7 +155,7 @@ public class SudokuGUI {
             for (int j = 0; j < 9; j++) {
                 JTextField cell = cells[i][j];
                 if (isGiven[i][j]) {
-                    cell.setText(String.valueOf(puzzle[i][j]));
+                    cell.setText(String.valueOf(puzzle.getGrid(i,j)));
                     cell.setEditable(false);
                     cell.setBackground(new Color(230, 240, 255));
                     cell.setForeground(Color.BLACK);
@@ -172,11 +178,11 @@ public class SudokuGUI {
         if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             try {
-                puzzle = FileManager.loadBoard(file).getArray();  // This returns int[9][9]
+                puzzle = FileManager.loadBoard(file);  // This returns int[9][9]
                 // Mark given cells
                 for (int i = 0; i < 9; i++) {
                     for (int j = 0; j < 9; j++) {
-                        isGiven[i][j] = (puzzle[i][j] != 0);
+                        isGiven[i][j] = (puzzle.getGrid(i,j) != 0);
                     }
                 }
                 updateGridUI();
@@ -188,6 +194,9 @@ public class SudokuGUI {
                 ex.printStackTrace(); // For debugging in console
             }
         }
+    }
+    public void undo(){
+
     }
 
     private void savePuzzleToFile() {
@@ -324,7 +333,7 @@ public class SudokuGUI {
 
         try {
             File autoSaveFile = new File("autosave.csv");
-            FileManager.saveBoard(autoSaveFile, new SudokuBoard(puzzle));
+            FileManager.saveBoard(autoSaveFile, puzzle);
             // Optional: show subtle feedback
              System.out.println("Auto-saved at " + java.time.LocalDateTime.now());
         } catch (IOException ex) {

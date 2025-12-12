@@ -5,9 +5,11 @@ import java.util.List;
 
 public class SudokuBoard {
     private final int[][] grid;
+    private List<Entry> history;
 
     public SudokuBoard(int[][] grid) {
         this.grid = grid;
+        history = new ArrayList<>();
     }
     public int[][] getArray() {
         return grid;
@@ -24,9 +26,17 @@ public class SudokuBoard {
         return list;
     }
     public void setDigit(int i, int j, int digit) {
+        history.add(new Entry(i, j, grid[i][j]));
         grid[i][j] = digit;
     }
-
+    public Entry undo(){
+        if(history.isEmpty()){
+            return null;
+        }
+        Entry entry = history.removeLast();
+        grid[entry.row][entry.col] = entry.value;
+      return entry;
+    }
     public int getGrid(int row, int col) {
         return grid[row][col];
     }
@@ -38,13 +48,3 @@ public class SudokuBoard {
     }
 }
 
- class Entry{
-    int  row;
-    int col;
-    int value;
-    public Entry(int row, int col, int value) {
-        this.row = row;
-        this.col = col;
-        this.value = value;
-    }
-}
