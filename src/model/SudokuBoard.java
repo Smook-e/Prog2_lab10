@@ -33,6 +33,10 @@ public class SudokuBoard {
         if(history.isEmpty()){
             return null;
         }
+        System.out.println(history.size());
+        for(int i = 0; i < history.size(); i++){
+            System.out.print(history.get(i).value+" ");
+        }
         Entry entry = history.removeLast();
         grid[entry.row][entry.col] = entry.value;
       return entry;

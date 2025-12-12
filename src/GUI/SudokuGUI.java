@@ -1,9 +1,12 @@
 package GUI;
 
+import model.Entry;
 import model.SudokuBoard;
 import storageManager.FileManager;
 
 import javax.swing.*;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 import java.awt.*;
 import java.io.*;
 import java.util.Arrays;
@@ -14,6 +17,7 @@ public class SudokuGUI {
     private JTextField[][] cells;
     private boolean[][] isGiven;
     private SudokuBoard puzzle;
+    private boolean undoing = false;
 
     public SudokuGUI() {
         cells = new JTextField[9][9];
@@ -71,6 +75,7 @@ public class SudokuGUI {
                         });
                         cells[row][col].getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
                                                                               private void updatePuzzle() {
+                                                                                  if (isGiven[row][col] || undoing) return;
                                                                                   String text = cells[row][col].getText().trim();
                                                                                   System.out.println(text);
                                                                                   if (text.isEmpty()) {
@@ -81,6 +86,7 @@ public class SudokuGUI {
                                                                                           puzzle.setDigit(row, col, Integer.parseInt(text));
 
                                                                                       } catch (NumberFormatException ex) {
+                                                                                          System.out.println("error");
                                                                                           puzzle.setDigit(row, col, 0); // safety
                                                                                       }
                                                                                   }
@@ -109,6 +115,7 @@ public class SudokuGUI {
         return gridPanel;
     }
 
+
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout());
 
@@ -118,11 +125,9 @@ public class SudokuGUI {
         JButton undoBtn = new JButton("Undo");
         undoBtn.addActionListener(e -> undo());
 
-        JButton saveBtn = new JButton("Save to CSV");
-        saveBtn.addActionListener(e -> savePuzzleToFile());
 
-        JButton solveBtn = new JButton("Solve");
-        solveBtn.addActionListener(e -> solveSudoku());
+
+
 
         JButton checkBtn = new JButton("Check Solution");
         checkBtn.addActionListener(e -> checkSolution());
@@ -132,8 +137,7 @@ public class SudokuGUI {
 
         panel.add(undoBtn);
         panel.add(loadBtn);
-        panel.add(saveBtn);
-        panel.add(solveBtn);
+
         panel.add(checkBtn);
         panel.add(clearBtn);
 
@@ -197,6 +201,15 @@ public class SudokuGUI {
     }
     public void undo(){
 
+            Entry e = puzzle.undo();
+            if (e != null) {
+                undoing = true;  // prevent listener
+                cells[e.row][e.col].setText(e.value == 0 ? "" : String.valueOf(e.value));
+                cells[e.row][e.col].setForeground(Color.BLUE);  // optional: keep user color
+                undoing = false;
+            }
+
+
     }
 
     private void savePuzzleToFile() {
@@ -216,83 +229,21 @@ public class SudokuGUI {
         }
     }
 
-    // === Solver, Checker, etc. (unchanged logic) ===
 
-    private void solveSudoku() {
-        int[][] grid = readGrid();
-        if (solveHelper(grid)) {
-            writeGrid(grid, Color.RED);
-            JOptionPane.showMessageDialog(frame, "Sudoku solved!");
-        } else {
-            JOptionPane.showMessageDialog(frame, "No solution exists.");
-        }
-    }
 
-    private boolean solveHelper(int[][] grid) {
-        // Standard backtracking implementation (same as before)
-        for (int row = 0; row < 9; row++) {
-            for (int col = 0; col < 9; col++) {
-                if (grid[row][col] == 0) {
-                    for (int num = 1; num <= 9; num++) {
-                        if (isSafe(grid, row, col, num)) {
-                            grid[row][col] = num;
-                            if (solveHelper(grid)) return true;
-                            grid[row][col] = 0;
-                        }
-                    }
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
-    private boolean isSafe(int[][] grid, int row, int col, int num) {
-        for (int x = 0; x < 9; x++) if (grid[row][x] == num || grid[x][col] == num) return false;
-        int br = row / 3 * 3, bc = col / 3 * 3;
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                if (grid[br + i][bc + j] == num) return false;
-        return true;
-    }
+
+
+
+
 
     private void checkSolution() {
-        int[][] grid = readGrid();
-        if (!isComplete(grid)) {
-            JOptionPane.showMessageDialog(frame, "Board is not fully filled.");
-            return;
-        }
-//        if (isValidSolution(grid)) {
-//            JOptionPane.showMessageDialog(frame, "Correct solution! 🎉");
-//        }
-        else {
-            JOptionPane.showMessageDialog(frame, "There are errors.");
-        }
+
     }
 
-    private boolean isComplete(int[][] grid) {
-        for (int[] row : grid) for (int cell : row) if (cell == 0) return false;
-        return true;
-    }
 
-//    private boolean isValidSolution(int[][] grid) {
-//        // Row, column, and box checks (same as before)
-//        for (int i = 0; i < 9; i++) {
-//            if (!isUnique(grid[i]) || !isUnique(getColumn(grid, i)) || !isUnique(getBox(grid, i))) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
 
-//    private boolean[] isUnique(int[] arr) {
-//        boolean[] seen = new boolean[10];
-//        for (int n : arr) {
-//            if (n != 0 && seen[n]) return false;
-//            seen[n] = true;
-//        }
-//        return seen;
-//    }
+
 
     private int[] getColumn(int[][] grid, int col) {
         int[] column = new int[9];
