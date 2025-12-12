@@ -2,7 +2,7 @@ package difficultyManager;
 
 import java.util.List;
 import model.DifficultyLevel;
-import javaapplication19.SudokuBoard;
+import model.SudokuBoard;
 
 public class DifficultyGenerator {
     private final RandomPairs randomPairs = new RandomPairs();

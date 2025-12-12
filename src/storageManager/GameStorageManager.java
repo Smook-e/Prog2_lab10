@@ -2,8 +2,7 @@ package storageManager;
 
 import java.io.IOException;
 import model.DifficultyLevel;
-import javaapplication19.SudokuBoard;
-
+import model.SudokuBoard;
 public class GameStorageManager {
 
     public void saveGame(DifficultyLevel level, SudokuBoard board) {
