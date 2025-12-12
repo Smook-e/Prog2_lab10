@@ -72,6 +72,7 @@ public class SudokuGUI {
                         cells[row][col].getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
                                                                               private void updatePuzzle() {
                                                                                   String text = cells[row][col].getText().trim();
+                                                                                  System.out.println(text);
                                                                                   if (text.isEmpty()) {
                                                                                       puzzle[row][col] = 0;
                                                                                   } else {
@@ -81,6 +82,7 @@ public class SudokuGUI {
                                                                                           puzzle[row][col] = 0; // safety
                                                                                       }
                                                                                   }
+                                                                                  autoSave();
                                                                               }
 
                                                                               public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -319,7 +321,7 @@ public class SudokuGUI {
         return grid;
     }
     private void autoSave() {
-        puzzle = readGrid();
+
         try {
             File autoSaveFile = new File("autosave.csv");
             FileManager.saveBoard(autoSaveFile, new SudokuBoard(puzzle));
