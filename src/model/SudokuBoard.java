@@ -30,5 +30,11 @@ public class SudokuBoard {
     public int getGrid(int row, int col) {
         return grid[row][col];
     }
+    public boolean isValid() {
+        return false;
+    }
+    public void clearDigit(int row, int col) {
+        grid[row][col] = 0;
+    }
 }
 

@@ -6,7 +6,7 @@ import java.util.Arrays;
 import model.SudokuBoard;
 
 public class FileManager {
-    public static void savePuzzle(File file, SudokuBoard board) throws IOException {
+    public static void saveBoard(File file, SudokuBoard board) throws IOException {
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             for (int i = 0; i < 9; i++) {

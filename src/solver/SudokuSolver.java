@@ -20,7 +20,7 @@ public class SudokuSolver {
             for (int i = 0; i < count; i++) {
                 int row = emptyCells.get(i)[0];
                 int col = emptyCells.get(i)[1];
-                board.setDigit(row, col, guess[i]);
+                board.setDigit(row, col, guess[i].getValue());
            }
             
             if (board.isValid()) {
