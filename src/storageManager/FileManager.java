@@ -1,29 +1,34 @@
 package storageManager;
 import java.io.*;
-import javaapplication19.SudokuBoard;
+import java.util.Arrays;
+
+
+import model.SudokuBoard;
+
 public class FileManager {
-    public static void saveBoard(String folder, SudokuBoard board) throws IOException {
-        new File(folder).mkdirs();    
-        BufferedWriter writer = new BufferedWriter(new FileWriter(folder + "/game.txt"));
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                writer.write(board.getGrid()[i][j]+ " ");//getGrid for return int[][]
+    public static void savePuzzle(File file, SudokuBoard board) throws IOException {
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    bw.write(String.valueOf(board.getGrid(i,j)));
+                    if (j < 8) bw.write(",");
+                }
+                bw.newLine();
             }
-            writer.newLine();
         }
-        writer.close();
     }
-    public static int[][] loadBoard(File file) throws IOException {
+    public static SudokuBoard loadBoard(File file) throws IOException {
         int[][] grid = new int[9][9];
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             for (int i = 0; i < 9; i++) {
                 String line = br.readLine();
                 if (line == null) {
-                    throw new IOException("File has fewer than 9 rows");
+                    throw new IOException("file has less than 9 rows");
                 }
                 String[] values = line.split(",");
                 if (values.length != 9) {
-                    throw new IOException("Row " + (i + 1) + " does not contain 9 values");
+                    throw new IOException("Row " + (i + 1) + " does not contain 9 numbers");
                 }
                 for (int j = 0; j < 9; j++) {
                     String val = values[j].trim();
@@ -45,7 +50,7 @@ public class FileManager {
         } catch (NumberFormatException e) {
             throw new IOException("Invalid number format in file: " + e.getMessage());
         }
-        return grid;
+        return new SudokuBoard(grid);
     }
     public static boolean exists(String folder) {
         return new File(folder + "/game.txt").exists();

@@ -7,7 +7,7 @@ public class SudokuBoard {
         this.grid = grid;
     }
 
-    public int get(int row, int col) {
+    public int getGrid(int row, int col) {
         return grid[row][col];
     }
 }
