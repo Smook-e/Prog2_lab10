@@ -69,6 +69,32 @@ public class SudokuGUI {
                                 }
                             }
                         });
+                        cells[row][col].getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+                                                                              private void updatePuzzle() {
+                                                                                  String text = cells[row][col].getText().trim();
+                                                                                  if (text.isEmpty()) {
+                                                                                      puzzle[row][col] = 0;
+                                                                                  } else {
+                                                                                      try {
+                                                                                          puzzle[row][col] = Integer.parseInt(text);
+                                                                                      } catch (NumberFormatException ex) {
+                                                                                          puzzle[row][col] = 0; // safety
+                                                                                      }
+                                                                                  }
+                                                                              }
+
+                                                                              public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                                                                                  updatePuzzle();
+                                                                              }
+
+                                                                              public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                                                                                  updatePuzzle();
+                                                                              }
+
+                                                                              public void changedUpdate(javax.swing.event.DocumentEvent e) {
+
+                                                                              }
+                                                                          });
 
                         block.add(cells[row][col]);
                     }
@@ -291,6 +317,18 @@ public class SudokuGUI {
             }
         }
         return grid;
+    }
+    private void autoSave() {
+        puzzle = readGrid();
+        try {
+            File autoSaveFile = new File("autosave.csv");
+            FileManager.saveBoard(autoSaveFile, new SudokuBoard(puzzle));
+            // Optional: show subtle feedback
+             System.out.println("Auto-saved at " + java.time.LocalDateTime.now());
+        } catch (IOException ex) {
+            // Fail silently or show a one-time warning
+            System.err.println("Auto-save failed: " + ex.getMessage());
+        }
     }
 
     private void writeGrid(int[][] grid, Color color) {
