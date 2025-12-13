@@ -55,4 +55,3 @@ public class SudokuBoard {
         grid[row][col] = 0;
     }
 }
-
