@@ -4,6 +4,13 @@
  */
 package View;
 
+import controller.SudokuController;
+import exceptions.NotFoundException;
+import javax.swing.JOptionPane;
+import model.DifficultyLevel;
+import model.Game;
+import model.SudokuBoard;
+
 /**
  *
  * @author HP
@@ -13,8 +20,39 @@ public class SudokuMainPage extends javax.swing.JFrame {
     /**
      * Creates new form SudokuMainPage
      */
+    private SudokuView view;
+    private SudokuController controller;
     public SudokuMainPage() {
         initComponents();
+        controller=new SudokuController();
+        view=new SudokuView(controller);
+    }
+    private void newGame(DifficultyLevel level)
+    {
+        try{
+            if(!view.getCatalog().allModesExist)
+            {
+                String link=JOptionPane.showInputDialog(this,"No saved game available.Enter link to a new game:");
+                if((link!=null)&&(!link.isEmpty()))
+                {
+                  try{
+                      int[][] boardArray=controller.getGameFromLink(link);
+                      SudokuBoard board=new SudokuBoard(boardArray);
+                      Game newGame=new Game(board,level);
+                      //open game frame   
+                  }catch(NotFoundException e)
+                  {
+                      JOptionPane.showMessageDialog(this,"Invalid Link");
+                  }      
+            }
+        }else{
+               Game game=view.getGame(level);
+               //open game frame
+            }
+    }catch(NotFoundException e)
+    {
+        JOptionPane.showMessageDialog(this,"Error starting game.");
+    }
     }
 
     /**
@@ -48,12 +86,27 @@ public class SudokuMainPage extends javax.swing.JFrame {
 
         button2.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         button2.setLabel("Easy");
+        button2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button2ActionPerformed(evt);
+            }
+        });
 
         button3.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         button3.setLabel("Medium");
+        button3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button3ActionPerformed(evt);
+            }
+        });
 
         button4.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         button4.setLabel("Hard");
+        button4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button4ActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel4.setText("Choose new game difficulty:");
@@ -104,8 +157,31 @@ public class SudokuMainPage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
-        // TODO add your handling code here:
+       try{
+           if(!view.getCatalog().current)
+           {
+               JOptionPane.showMessageDialog(this,"Couldn't find a previous game.");
+               return;
+           }
+           Game game=view.getPreviousGame();
+           //open game board and close this one
+       }catch(NotFoundException e)
+       {
+          JOptionPane.showMessageDialog(this,"Error loading previous game."); 
+       }
     }//GEN-LAST:event_button1ActionPerformed
+
+    private void button2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button2ActionPerformed
+        newGame(DifficultyLevel.EASY);
+    }//GEN-LAST:event_button2ActionPerformed
+
+    private void button3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button3ActionPerformed
+        newGame(DifficultyLevel.MEDIUM);
+    }//GEN-LAST:event_button3ActionPerformed
+
+    private void button4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button4ActionPerformed
+        newGame(DifficultyLevel.HARD);
+    }//GEN-LAST:event_button4ActionPerformed
 
     /**
      * @param args the command line arguments
