@@ -46,6 +46,11 @@ public class SudokuView implements Viewable {
         SudokuBoard board=new SudokuBoard(boardArray);
         return new Game(board,level);
     }
+    public Game getPreviousGame()throws NotFoundException
+    {
+        int[][] boardArray=controller.getGame('I');
+        return new Game(new SudokuBoard(boardArray),null);
+    }
 
     @Override
     public void driveGames(Game source) throws SolutionInvalidException {

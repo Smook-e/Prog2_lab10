@@ -20,4 +20,5 @@ public interface Controllable {
     boolean[][] verifyGame(int[][] game);
     int[][] solveGame(int[][] game)throws InvalidGame;
     void logUserAction(UserAction userAction)throws IOException;
+    int[][] getGameFromLink(String file)throws NotFoundException;
 }

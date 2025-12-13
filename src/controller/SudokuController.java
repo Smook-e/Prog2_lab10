@@ -15,8 +15,11 @@ import java.io.IOException;
 import model.Catalog;
 import model.DifficultyLevel;
 import model.SudokuBoard;
+import model.SudokuVerifier;
 import model.UserAction;
+import model.ValidationResult;
 import solver.SudokuSolver;
+import storageManager.FileManager;
 import storageManager.GameCatalog;
 import storageManager.GameStorageManager;
 import undo.UndoForGUI;
@@ -30,6 +33,10 @@ public class SudokuController implements Controllable {
     private GameStorageManager storageManager=new GameStorageManager();
     private GameCatalog gameCatalog=new GameCatalog();
     private SudokuBoard current;
+    public GameStorageManager getGameStorageManager()
+    {
+        return storageManager;
+    }
     @Override
     public Catalog getCatalog() {
         Catalog catalog=new Catalog();
@@ -102,7 +109,7 @@ public class SudokuController implements Controllable {
                     continue;
                 }
                 String[] parts=error.split("[ ,]+");
-                index=Integer.parseInt(parts[1])-1; //0-based indexing
+                index=Integer.parseInt(parts[1])-1;
                 if(type.equals("ROW"))
                 {
                     for(int z=0;z<9;z++)
@@ -172,6 +179,17 @@ public class SudokuController implements Controllable {
             System.arraycopy(source[i], 0, copy[i],0, 9);
         }
         return copy;
+    }
+
+    @Override
+    public int[][] getGameFromLink(String file) throws NotFoundException {
+       try{
+           SudokuBoard board=FileManager.loadBoard(file);
+           return board.getArray();
+       }catch(IOException e)
+       {
+           throw new NotFoundException();
+       }
     }
     
     
