@@ -12,7 +12,7 @@ public class SudokuSolver {
     public boolean solve() {
         List<int[]> emptyCells = board.getEmptyCells();
         int count = emptyCells.size();
-        PermutationIterator iterator = new PermutationIterator();
+        iterator<Digit[]> iterator= new PermutationIterator();
 
         while (iterator.hasNext()) {
             Digit[] guess = iterator.next();

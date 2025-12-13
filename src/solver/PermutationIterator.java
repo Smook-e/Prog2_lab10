@@ -2,7 +2,7 @@ package solver;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-public class PermutationIterator {
+public class PermutationIterator implements iterator<Digit[]> {
 
     private final int[] counters = new int[5]; 
     private boolean hasNext = true;
@@ -10,10 +10,11 @@ public class PermutationIterator {
     public PermutationIterator() {
         Arrays.fill(counters, 1); 
     }
-
+@Override
     public boolean hasNext() {
         return hasNext;
     }
+    @Override
     public Digit[] next() {
         if (!hasNext) {
             throw new NoSuchElementException("No more permutations");
