@@ -33,9 +33,51 @@ public class SudokuBoard {
     public int getGrid(int row, int col) {
         return grid[row][col];
     }
+    //////////////////////////////////////
     public boolean isValid() {
-        return false;
+        // Check rows
+    for (int i = 0; i < 9; i++) {
+        boolean[] seen = new boolean[10];
+        for (int j = 0; j < 9; j++) {
+            int val = grid[i][j];
+            if (val != 0) {
+                if (seen[val]) return false;
+                seen[val] = true;
+            }
+        }
     }
+
+    // Check columns
+    for (int j = 0; j < 9; j++) {
+        boolean[] seen = new boolean[10];
+        for (int i = 0; i < 9; i++) {
+            int val = grid[i][j];
+            if (val != 0) {
+                if (seen[val]) return false;
+                seen[val] = true;
+            }
+        }
+    }
+
+    // Check 3x3 boxes
+    for (int blockRow = 0; blockRow < 3; blockRow++) {
+        for (int blockCol = 0; blockCol < 3; blockCol++) {
+            boolean[] seen = new boolean[10];
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    int val = grid[blockRow * 3 + i][blockCol * 3 + j];
+                    if (val != 0) {
+                        if (seen[val]) return false;
+                        seen[val] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+    
     public void clearDigit(int row, int col) {
         grid[row][col] = 0;
     }

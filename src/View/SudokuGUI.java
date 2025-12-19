@@ -10,6 +10,7 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.io.*;
 import java.util.Arrays;
+import solver.SudokuSolver;
 import undo.UndoLogEntry;
 import undo.UndoLogManager;
 import static undo.UndoLogManager.clear;
@@ -142,6 +143,8 @@ public class SudokuGUI {
         undoBtn.addActionListener(e -> undo());
 
 
+JButton solveBtn = new JButton("solver");
+        solveBtn.addActionListener(e -> Solution());
 
 
 
@@ -153,7 +156,7 @@ public class SudokuGUI {
 
         panel.add(undoBtn);
         panel.add(loadBtn);
-
+        panel.add(solveBtn);
         panel.add(checkBtn);
         panel.add(clearBtn);
 
@@ -257,12 +260,28 @@ public class SudokuGUI {
 ///////// SAVE BOARD TO GAME FILE 
     private void saveGameFile() {
         try {
-            FileManager.saveBoard(INCOMPLETE_FOLDER, puzzle); // saves to incomplete/game.txt
+            FileManager.saveBoard(INCOMPLETE_FOLDER, puzzle); 
         } catch (IOException ex) {
             System.err.println("Error saving game file");
         }
     }
   
+   private void Solution() {
+    SudokuSolver solver = new SudokuSolver(puzzle);
+    boolean solved = solver.solve();
+    if (solved) {
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+                int value = puzzle.getGrid(r, c);
+                cells[r][c].setText(String.valueOf(value));
+                cells[r][c].setForeground(Color.RED); // solved numbers in red
+            }
+        }
+        JOptionPane.showMessageDialog(frame, "Puzzle solved!");
+    } else {
+        JOptionPane.showMessageDialog(frame, "No solution exists!");
+    }
+    }
 
     private void checkSolution() {
 
