@@ -10,6 +10,8 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.io.*;
 import java.util.Arrays;
+import undo.UndoLogEntry;
+import undo.UndoLogManager;
 
 public class SudokuGUI {
 
@@ -82,13 +84,22 @@ public class SudokuGUI {
                                                                                       puzzle.setDigit(row, col, 0);
 
                                                                                   } else {
+                                                                                      
                                                                                       try {
-                                                                                          puzzle.setDigit(row, col, Integer.parseInt(text));
-
+                                                                                     int val = Integer.parseInt(text);
+                                                                                     int prev = puzzle.getGrid(row, col);
+                                                                                          puzzle.setDigit(row, col, val);
+                                                                                          UndoLogManager.logMove(
+                                                                                         "incomplete",
+                                                                                         new UndoLogEntry(row, col, val, prev)
+                                                                                           );
                                                                                       } catch (NumberFormatException ex) {
                                                                                           System.out.println("error");
                                                                                           puzzle.setDigit(row, col, 0); // safety
                                                                                       }
+                                                                                     catch (IOException ex) {
+                                                                                         System.err.println("Undo log failed");
+                                                                                                   }
                                                                                   }
                                                                                   autoSave();
                                                                               }
@@ -199,15 +210,22 @@ public class SudokuGUI {
             }
         }
     }
+    /////////////////////////////////////
     public void undo(){
 
-            Entry e = puzzle.undo();
-            if (e != null) {
-                undoing = true;  // prevent listener
-                cells[e.row][e.col].setText(e.value == 0 ? "" : String.valueOf(e.value));
-                cells[e.row][e.col].setForeground(Color.BLUE);  // optional: keep user color
-                undoing = false;
-            }
+           try {
+    UndoLogEntry e = UndoLogManager.popLast("incomplete");
+    if (e != null) {
+        undoing = true;
+        puzzle.setDigit(e.row, e.col, e.prev);
+        cells[e.row][e.col].setText(
+            e.prev == 0 ? "" : String.valueOf(e.prev)
+        );
+        undoing = false;
+    }
+} catch (IOException ex) {
+    System.err.println("Undo failed");
+}
 
 
     }
