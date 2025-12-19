@@ -20,7 +20,8 @@ public class SudokuGUI {
     private boolean[][] isGiven;
     private SudokuBoard puzzle;
     private boolean undoing = false;
-
+    // Folder for incomplete games
+    private static final String INCOMPLETE_FOLDER = "incomplete";
     public SudokuGUI() {
         cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
@@ -101,7 +102,8 @@ public class SudokuGUI {
                                                                                          System.err.println("Undo log failed");
                                                                                                    }
                                                                                   }
-                                                                                  autoSave();
+                                                                                 
+                                                                                  saveGameFile(); // save current board to game.txt
                                                                               }
 
                                                                               public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -183,33 +185,53 @@ public class SudokuGUI {
             }
         }
     }
+     private void loadPuzzleFromFile() {
+       JFileChooser chooser = new JFileChooser();
+    chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 
-    // === File Operations (delegated to FileManager) ===
+    if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+        File file = chooser.getSelectedFile();
 
-    private void loadPuzzleFromFile() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        try {
+            // READ CSV MANUALLY 
+            int[][] board = new int[9][9];
+            BufferedReader br = new BufferedReader(new FileReader(file));
 
-        if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
-            try {
-                puzzle = FileManager.loadBoard(file);  // This returns int[9][9]
-                // Mark given cells
-                for (int i = 0; i < 9; i++) {
-                    for (int j = 0; j < 9; j++) {
-                        isGiven[i][j] = (puzzle.getGrid(i,j) != 0);
-                    }
+            for (int i = 0; i < 9; i++) {
+                String[] values = br.readLine().split(",");
+                for (int j = 0; j < 9; j++) {
+                    board[i][j] = Integer.parseInt(values[j].trim());
                 }
-                updateGridUI();
-                JOptionPane.showMessageDialog(frame, "Puzzle loaded successfully from:\n" + file.getName());
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame,
-                        "Failed to load puzzle:\n" + ex.getMessage(),
-                        "Load Error", JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace(); // For debugging in console
             }
+            br.close();
+
+            // CREATE BOARD 
+            puzzle = new SudokuBoard(board);
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    isGiven[i][j] = (puzzle.getGrid(i, j) != 0);
+                }
+            }
+
+            // ====== RESET INCOMPLETE FOLDER 
+            UndoLogManager.clear("incomplete");      // clear undo.log
+            FileManager.saveBoard("incomplete", puzzle); // save game.txt
+
+            updateGridUI();
+
+            JOptionPane.showMessageDialog(frame,
+                    "Puzzle loaded successfully from CSV:\n" + file.getName());
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(frame,
+                    "Failed to load puzzle:\n" + ex.getMessage(),
+                    "Load Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
     }
+}
+        
+     
     /////////////////////////////////////
     public void undo(){
 
@@ -229,39 +251,19 @@ public class SudokuGUI {
 
 
     }
-
-    private void savePuzzleToFile() {
-        JFileChooser chooser = new JFileChooser();
-        if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
-            if (!file.getName().toLowerCase().endsWith(".csv")) {
-                file = new File(file.getAbsolutePath() + ".csv");
-            }
-            try {
-                FileManager.saveBoard(file, new SudokuBoard(readGrid()) );
-                JOptionPane.showMessageDialog(frame, "Puzzle saved successfully!");
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(frame, "Error saving file:\n" + ex.getMessage(),
-                        "Save Error", JOptionPane.ERROR_MESSAGE);
-            }
+///////// SAVE BOARD TO GAME FILE 
+    private void saveGameFile() {
+        try {
+            FileManager.saveBoard(INCOMPLETE_FOLDER, puzzle); // saves to incomplete/game.txt
+        } catch (IOException ex) {
+            System.err.println("Error saving game file");
         }
     }
-
-
-
-
-
-
-
-
+  
 
     private void checkSolution() {
 
     }
-
-
-
-
 
     private int[] getColumn(int[][] grid, int col) {
         int[] column = new int[9];
@@ -298,30 +300,7 @@ public class SudokuGUI {
         }
         return grid;
     }
-    private void autoSave() {
-
-        try {
-            File autoSaveFile = new File("autosave.csv");
-            FileManager.saveBoard(autoSaveFile, puzzle);
-            // Optional: show subtle feedback
-             System.out.println("Auto-saved at " + java.time.LocalDateTime.now());
-        } catch (IOException ex) {
-            // Fail silently or show a one-time warning
-            System.err.println("Auto-save failed: " + ex.getMessage());
-        }
-    }
-
-    private void writeGrid(int[][] grid, Color color) {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (!isGiven[i][j]) {
-                    cells[i][j].setText(String.valueOf(grid[i][j]));
-                    cells[i][j].setForeground(color);
-                }
-            }
-        }
-    }
-
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(SudokuGUI::new);
     }
