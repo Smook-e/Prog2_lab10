@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.Arrays;
 import undo.UndoLogEntry;
 import undo.UndoLogManager;
+import static undo.UndoLogManager.clear;
 
 public class SudokuGUI {
 
@@ -77,34 +78,36 @@ public class SudokuGUI {
                             }
                         });
                         cells[row][col].getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-                                                                              private void updatePuzzle() {
-                                                                                  if (isGiven[row][col] || undoing) return;
-                                                                                  String text = cells[row][col].getText().trim();
-                                                                                  System.out.println(text);
-                                                                                  if (text.isEmpty()) {
-                                                                                      puzzle.setDigit(row, col, 0);
+   private void updatePuzzle() {
+    if (isGiven[row][col] || undoing) return;
 
-                                                                                  } else {
-                                                                                      
-                                                                                      try {
-                                                                                     int val = Integer.parseInt(text);
-                                                                                     int prev = puzzle.getGrid(row, col);
-                                                                                          puzzle.setDigit(row, col, val);
-                                                                                          UndoLogManager.logMove(
-                                                                                         "incomplete",
-                                                                                         new UndoLogEntry(row, col, val, prev)
-                                                                                           );
-                                                                                      } catch (NumberFormatException ex) {
-                                                                                          System.out.println("error");
-                                                                                          puzzle.setDigit(row, col, 0); // safety
-                                                                                      }
-                                                                                     catch (IOException ex) {
-                                                                                         System.err.println("Undo log failed");
-                                                                                                   }
-                                                                                  }
-                                                                                 
-                                                                                  saveGameFile(); // save current board to game.txt
-                                                                              }
+    String text = cells[row][col].getText().trim();
+    int prev = puzzle.getGrid(row, col);
+
+    if (text.isEmpty()) {
+        puzzle.setDigit(row, col, 0);
+    } else {
+        try {
+            int val = Integer.parseInt(text);
+            puzzle.setDigit(row, col, val);
+        } catch (NumberFormatException ex) {
+            puzzle.setDigit(row, col, 0); // safety
+        }
+    }
+
+    // ==== LOGGING ====
+    // Only log if value changed
+    try {
+        UndoLogManager.logMove("incomplete",
+                new UndoLogEntry(row, col,
+                        puzzle.getGrid(row, col), prev));
+    } catch (IOException ex) {
+        System.err.println("Undo log failed");
+    }
+
+    saveGameFile();
+}
+
 
                                                                               public void insertUpdate(javax.swing.event.DocumentEvent e) {
                                                                                   updatePuzzle();
@@ -288,6 +291,8 @@ public class SudokuGUI {
                 }
             }
         }
+        saveGameFile(); 
+        clear("incomplete");
     }
 
     private int[][] readGrid() {
