@@ -1,8 +1,8 @@
 package model;
 public enum DifficultyLevel {
     EASY("easy", 10),
-    MEDIUM("medium", 15),
-    HARD("hard", 20);
+    MEDIUM("medium", 20),
+    HARD("hard", 25);
     
     private String folderName;
     private int cellsToRemove;
