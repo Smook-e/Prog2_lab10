@@ -16,6 +16,8 @@ import static model.DifficultyLevel.EASY;
 import model.Game;
 import model.SudokuBoard;
 import model.UserAction;
+import undo.UndoLogEntry;
+import undo.UndoLogManager;
 
 /**
  *
@@ -97,6 +99,13 @@ public class SudokuView implements Viewable {
         int prevNum=Integer.parseInt(parts[3]);
         controller.logUserAction(new UserAction(row,col,num,prevNum));
         
+    }
+    public void undo(Game game)throws IOException{
+       UndoLogEntry e = UndoLogManager.popLast("incomplete");
+       if(e!=null)
+       {
+           game.getBoard().setDigit(e.row, e.col, e.prev);
+       }
     }
     
 }
