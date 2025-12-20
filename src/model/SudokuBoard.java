@@ -27,8 +27,14 @@ public class SudokuBoard {
         grid[i][j] = digit;
     }
     public SudokuBoard newBoard(){
-        SudokuBoard board = new SudokuBoard(grid);
-        return board;
+       /* SudokuBoard board = new SudokuBoard(grid);
+        return board;*/
+       int[][]copy =new int[9][9];
+       for(int i=0;i<9;i++)
+       {
+           System.arraycopy(grid[i],0,copy[i],0,9);
+       }
+       return new SudokuBoard(copy);
     }
     public int getGrid(int row, int col) {
         return grid[row][col];
