@@ -160,7 +160,7 @@ public class SudokuController implements Controllable {
 
     @Override
     public void logUserAction(UserAction userAction) throws IOException {
-        File folder=new File("current");
+        File folder=new File("incomplete");
         folder.mkdirs();
         File log=new File(folder,"moves.log");
         try(BufferedWriter writer=new BufferedWriter(new FileWriter(log,true)))
