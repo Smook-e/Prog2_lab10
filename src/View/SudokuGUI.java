@@ -402,5 +402,9 @@ public class SudokuGUI {
         UndoLogManager.clear("incomplete");
         FileManager.delete("incomplete");
        //call first frame
+       SwingUtilities.invokeLater(()->{
+           new SudokuMainPage().setVisible(true);
+       });
+       frame.dispose();
     }
 }
