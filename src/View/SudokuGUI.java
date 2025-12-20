@@ -1,5 +1,6 @@
 package View;
 
+import exceptions.InvalidGame;
 import model.Entry;
 import model.SudokuBoard;
 import storageManager.FileManager;
@@ -10,6 +11,7 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.io.*;
 import java.util.Arrays;
+import model.Game;
 import solver.SudokuSolver;
 import undo.UndoLogEntry;
 import undo.UndoLogManager;
@@ -17,19 +19,25 @@ import static undo.UndoLogManager.clear;
 
 public class SudokuGUI {
 
-    private JFrame frame;
+    JFrame frame;
     private JTextField[][] cells;
     private boolean[][] isGiven;
     private SudokuBoard puzzle;
     private boolean undoing = false;
     // Folder for incomplete games
     private static final String INCOMPLETE_FOLDER = "incomplete";
-    public SudokuGUI() {
-        cells = new JTextField[9][9];
+    private SudokuView view;
+    private Game currentGame;
+    public SudokuGUI(SudokuView view,Game game) {
+        this.view=view;
+        this.currentGame=game;
+        this.puzzle=game.getBoard();
+        /*cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
-        puzzle = new SudokuBoard(new int[9][9]);
+        puzzle = new SudokuBoard(new int[9][9]);*/
         initializeGUI();
-        resetPuzzle();
+        updateGridUI();
+        /*resetPuzzle();*/
     }
 
     private void initializeGUI() {
@@ -136,26 +144,27 @@ public class SudokuGUI {
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout());
 
-        JButton loadBtn = new JButton("Load from CSV");
-        loadBtn.addActionListener(e -> loadPuzzleFromFile());
+        /*JButton loadBtn = new JButton("Load from CSV");
+        loadBtn.addActionListener(e -> loadPuzzleFromFile());*/
 
         JButton undoBtn = new JButton("Undo");
         undoBtn.addActionListener(e -> undo());
 
+        JButton solveBtn = new JButton("Solve");
+        solveBtn.addActionListener(e -> solve());
+        
+        JButton exitBtn = new JButton("Exit");
+        exitBtn.addActionListener(e -> exit());
 
-JButton solveBtn = new JButton("solver");
-        solveBtn.addActionListener(e -> Solution());
-
-
-
-        JButton checkBtn = new JButton("Check Solution");
-        checkBtn.addActionListener(e -> checkSolution());
+        JButton checkBtn = new JButton("Verify");
+        checkBtn.addActionListener(e -> verify());
 
         JButton clearBtn = new JButton("Clear User Entries");
         clearBtn.addActionListener(e -> clearUserEntries());
 
         panel.add(undoBtn);
-        panel.add(loadBtn);
+        /*panel.add(loadBtn);*/
+        panel.add(exitBtn);
         panel.add(solveBtn);
         panel.add(checkBtn);
         panel.add(clearBtn);
@@ -191,7 +200,7 @@ JButton solveBtn = new JButton("solver");
             }
         }
     }
-     private void loadPuzzleFromFile() {
+   /*  private void loadPuzzleFromFile() {
        JFileChooser chooser = new JFileChooser();
     chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 
@@ -235,13 +244,13 @@ JButton solveBtn = new JButton("solver");
             ex.printStackTrace();
         }
     }
-}
+}*/
         
      
     /////////////////////////////////////
     public void undo(){
 
-           try {
+         /*  try {
     UndoLogEntry e = UndoLogManager.popLast("incomplete");
     if (e != null) {
         undoing = true;
@@ -253,10 +262,17 @@ JButton solveBtn = new JButton("solver");
     }
 } catch (IOException ex) {
     System.err.println("Undo failed");
-}
-
-
+}*/
+    try{
+        undoing = true;
+        view.undo(currentGame);
+        updateGridUI();
+        undoing = false;
+    }catch(IOException e){
+        System.err.println("Undo failed");
     }
+
+ }
 ///////// SAVE BOARD TO GAME FILE 
     private void saveGameFile() {
         try {
@@ -266,8 +282,8 @@ JButton solveBtn = new JButton("solver");
         }
     }
   
-   private void Solution() {
-    SudokuSolver solver = new SudokuSolver(puzzle);
+   private void solve() {
+    /*SudokuSolver solver = new SudokuSolver(puzzle);
     boolean solved = solver.solve();
     if (solved) {
         for (int r = 0; r < 9; r++) {
@@ -280,11 +296,51 @@ JButton solveBtn = new JButton("solver");
         JOptionPane.showMessageDialog(frame, "Puzzle solved!");
     } else {
         JOptionPane.showMessageDialog(frame, "No solution exists!");
+    }*/
+    int emptyCells =puzzle.getEmptyCells().size();
+    if(emptyCells!=5)
+    {
+       JOptionPane.showMessageDialog(frame,"Solve only works when exactly 5 cells left");
+       return;
     }
+    try{
+        int[] solve=view.solveGame(currentGame);
+        int index=0;
+        for(int i=0;i<9;i++)
+        {
+            for(int j=0;j<9;j++)
+            {
+                int value=solve[index++];
+                puzzle.setDigit(i, j, value);
+                cells[i][j].setText(String.valueOf(value));
+                cells[i][j].setForeground(Color.red);
+            }
+        }
+        JOptionPane.showMessageDialog(frame,"Puzzle solved!");
+        UndoLogManager.clear("incomplete");
+        FileManager.delete("incomplete");
+        
+    }catch(InvalidGame e)
+    {
+        JOptionPane.showMessageDialog(frame,"No valid solution exit for this board.");
     }
+}
 
-    private void checkSolution() {
-
+    private void verify() {
+        if(puzzle.getEmptyCells().size()>0)
+        {
+            JOptionPane.showMessageDialog(frame,"Incomplete board.Please fill all cells first.");
+            return;
+        }
+        String verify=view.verifyGame(currentGame);
+        if("VALID".equals(verify))
+        {
+            JOptionPane.showMessageDialog(frame,"Valid solution.");
+        }else{
+           JOptionPane.showMessageDialog(frame,"Invalid solution."); 
+        }
+        UndoLogManager.clear("incomplete");
+        FileManager.delete("incomplete");
     }
 
     private int[] getColumn(int[][] grid, int col) {
@@ -326,6 +382,25 @@ JButton solveBtn = new JButton("solver");
     }
     
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(SudokuGUI::new);
+       /* SwingUtilities.invokeLater(SudokuGUI::new);*/
+    }
+
+    private void exit() {
+        if(puzzle.getEmptyCells().size()>0)
+        {
+            frame.dispose();
+            System.exit(0);
+            return;
+        }
+        String verify=view.verifyGame(currentGame);
+        if("VALID".equals(verify))
+        {
+            JOptionPane.showMessageDialog(frame,"Congrats!!! Game completed and solution is valid.");
+        }else{
+           JOptionPane.showMessageDialog(frame,"Game completed but solution is invalid."); 
+        }
+        UndoLogManager.clear("incomplete");
+        FileManager.delete("incomplete");
+       //call first frame
     }
 }
