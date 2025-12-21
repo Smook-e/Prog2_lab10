@@ -34,17 +34,64 @@ public class SudokuGUI {
         this.puzzle=game.getBoard();
         cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
-        for(int i=0;i<9;i++)
+        /*for(int i=0;i<9;i++)
         {
             for(int j=0;j<9;j++)
             {
                 isGiven[i][j]=puzzle.getGrid(i, j)!=0;
             }
-        }
+        }*/
         /*puzzle = new SudokuBoard(new int[9][9]);*/
+        File givenFile=new File(INCOMPLETE_FOLDER+"/givens.txt");
+        if(!givenFile.exists())
+        {
+            for(int i=0;i<9;i++)
+            {
+                for(int j=0;j<9;j++)
+                {
+                    isGiven[i][j]=puzzle.getGrid(i, j)!=0;
+                }
+            }
+            saveGiven();
+        }
+        else{
+            loadGiven();
+        }
         initializeGUI();
         updateGridUI();
         /*resetPuzzle();*/
+}
+    private void saveGiven()
+    {
+        try(BufferedWriter w=new BufferedWriter(new FileWriter(INCOMPLETE_FOLDER+"/givens.txt"))){
+            for(int i=0;i<9;i++)
+            {
+                for(int j=0;j<9;j++){
+                    w.write(isGiven[i][j]?"1 ":"0 ");
+                } 
+                w.newLine();
+            }
+        }catch(IOException e)
+        {
+            System.err.println("failed to save givens");
+        }
+    }
+    private void loadGiven()
+    {
+        File file=new File(INCOMPLETE_FOLDER+"/givens.txt");
+        if(!file.exists())return;
+        try(BufferedReader r=new BufferedReader(new FileReader(file)))
+        {
+             for(int i=0;i<9;i++)
+            {   String[] part=r.readLine().trim().split("\\s+");
+                for(int j=0;j<9;j++){
+                    isGiven[i][j]=part[j].equals("1");
+                }
+            }
+        }catch(IOException e)
+        {
+            System.err.println("failed to load givens");
+        }
     }
 
     private void initializeGUI() {
