@@ -53,7 +53,7 @@ public class SudokuGUI {
             {
                 isGiven[i][j]=puzzle.getGrid(i, j)!=0;
             }
-        }*/
+        }
         /*puzzle = new SudokuBoard(new int[9][9]);*/
         /*File givenFile=new File(INCOMPLETE_FOLDER+"/givens.txt");
         if(!givenFile.exists())
