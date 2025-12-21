@@ -6,6 +6,7 @@ package View;
 
 import controller.SudokuController;
 import exceptions.NotFoundException;
+import exceptions.SolutionInvalidException;
 import javax.swing.JOptionPane;
 import model.DifficultyLevel;
 import model.Game;
@@ -27,27 +28,37 @@ public class SudokuMainPage extends javax.swing.JFrame {
         controller=new SudokuController();
         view=new SudokuView(controller);
     }
-    private void newGame(DifficultyLevel level)
+    private void newGame(DifficultyLevel level) 
     {
         try{
             if(!view.getCatalog().allModesExist)
             {
                 String link=JOptionPane.showInputDialog(this,"No saved game available.Enter link to a new game:");
-                if((link!=null)&&(!link.isEmpty()))
-                {
+                if((link==null)||(link.isEmpty()))return;
+                
                   try{
                       int[][] boardArray=controller.getGameFromLink(link);
-                      SudokuBoard board=new SudokuBoard(boardArray);
-                      Game newGame=new Game(board,level);
+                      controller.driveGames(boardArray);
+                      Game newGame=view.getGame(level); 
                       //open game frame   
+                      SudokuGUI gameBoard=new SudokuGUI(view,newGame);
+                      gameBoard.frame.setVisible(true);
+                      this.dispose();
+                     
                   }catch(NotFoundException e)
                   {
-                      JOptionPane.showMessageDialog(this,"Invalid Link");
-                  }      
-            }
+                      JOptionPane.showMessageDialog(this,"Invalid Link.");
+                  } catch(SolutionInvalidException e){
+                      JOptionPane.showMessageDialog(this,"Generated solution is invalid.");
+                  }     
+            
         }else{
                Game game=view.getGame(level);
                //open game frame
+               SudokuGUI gameBoard=new SudokuGUI(view,game);
+               gameBoard.frame.setVisible(true);
+               this.dispose();
+               
             }
     }catch(NotFoundException e)
     {
@@ -165,6 +176,9 @@ public class SudokuMainPage extends javax.swing.JFrame {
            }
            Game game=view.getPreviousGame();
            //open game board and close this one
+           SudokuGUI gameBoard=new SudokuGUI(view,game);
+           gameBoard.frame.setVisible(true);
+           this.dispose();
        }catch(NotFoundException e)
        {
           JOptionPane.showMessageDialog(this,"Error loading previous game."); 
