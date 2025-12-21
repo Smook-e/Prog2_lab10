@@ -12,6 +12,15 @@ public class SudokuBoard {
     public int[][] getArray() {
         return grid;
     }
+    ///////////////
+    public int[][] getArrayCopy() {
+    int[][] copy = new int[grid.length][grid[0].length];
+    for (int i = 0; i < grid.length; i++) {
+        System.arraycopy(grid[i], 0, copy[i], 0, grid[i].length);
+    }
+    return copy;
+}
+
     public List<int[]> getEmptyCells() {
         List<int[]> list = new ArrayList<>();
         for (int i = 0; i < grid.length; i++) {

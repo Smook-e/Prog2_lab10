@@ -31,7 +31,7 @@ public class SudokuSolver implements SolutionObserver {
             int end = (i == threadCount - 1)? totalPermutations - 1: (start + range - 1);
 
             SudokuBoard workerBoard =
-                    new SudokuBoard(originalBoard.getArray());
+                    new SudokuBoard(originalBoard.getArrayCopy());
 
             iterator<int[]> iterator =
                     new RangePermutationIterator(start, end, 5);
