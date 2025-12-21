@@ -8,13 +8,11 @@ import java.util.*;
 
 
 public class SudokuVerifier {
-
-
-
-
         public ValidationResult validate(SudokuBoard board) {
             ValidationResult result = new ValidationResult();
-
+            if(!isComplete(board)) {
+                result.markIncomplete();
+            }
             // Check rows
             for (int row = 0; row < 9; row++) {
                 validateRow(board, row, result);
@@ -45,7 +43,7 @@ public class SudokuVerifier {
             }
             for (Map.Entry<Integer, List<Integer>> entry : seen.entrySet()) {
                 if (entry.getValue().size() > 1) {
-                    result.addError("Row" + (row + 1) + " has duplicate" + entry.getKey() + "at columns" +  entry.getValue()
+                    result.addError("Row" + (row + 1) + " has duplicate " + entry.getKey() + " at columns " +  entry.getValue()
                            );
                 }
             }
@@ -61,7 +59,7 @@ public class SudokuVerifier {
             }
             for (Map.Entry<Integer, List<Integer>> entry : seen.entrySet()) {
                 if (entry.getValue().size() > 1) {
-                    result.addError("Column" + (col + 1) + " has duplicate" + entry.getKey() + "at columns" +  entry.getValue()
+                    result.addError("Column" + (col + 1) + " has duplicate " + entry.getKey() + " at columns " +  entry.getValue()
                     );
 
                 }
@@ -89,7 +87,7 @@ public class SudokuVerifier {
 
 
         public boolean isComplete(SudokuBoard board) {
-            if (!validate(board).isValid()) return false;
+
             for (int[] row : board.getArray()) {
                 for (int cell : row) {
                     if (cell == 0) return false;

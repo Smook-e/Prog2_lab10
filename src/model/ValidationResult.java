@@ -34,4 +34,15 @@ public class ValidationResult {
     public void markIncomplete() {
         complete = false;
     }
+    @Override
+    public String toString() {
+        if (valid) {
+            return "Board is valid!";
+        }
+        StringBuilder sb = new StringBuilder("Board has errors:\n");
+        for (String error : errors) {
+            sb.append("- ").append(error).append("\n");
+        }
+        return sb.toString();
+    }
 }
