@@ -13,6 +13,9 @@ public class SudokuVerifier {
             if(!isComplete(board)) {
                 result.markIncomplete();
             }
+            else{
+                result.markComplete();
+            }
             // Check rows
             for (int row = 0; row < 9; row++) {
                 validateRow(board, row, result);

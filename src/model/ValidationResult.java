@@ -11,7 +11,7 @@ import java.util.List;
 public class ValidationResult {
 
     private boolean valid = true;
-    private boolean complete = true;
+    private boolean complete = false;
     private List<String> errors = new ArrayList<>();
 
     public boolean isValid() {
@@ -34,6 +34,7 @@ public class ValidationResult {
     public void markIncomplete() {
         complete = false;
     }
+    public void markComplete() {    complete = true; }
     @Override
     public String toString() {
         if (valid) {
