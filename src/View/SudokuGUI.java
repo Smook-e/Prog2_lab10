@@ -236,6 +236,7 @@ public class SudokuGUI {
         }
     }
 private void updateGridUI() {
+    undoing = true;
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 JTextField cell = cells[i][j];
@@ -254,6 +255,7 @@ private void updateGridUI() {
                 }
             }
         }
+            undoing = false;
     }
    /*  private void loadPuzzleFromFile() {
        JFileChooser chooser = new JFileChooser();
