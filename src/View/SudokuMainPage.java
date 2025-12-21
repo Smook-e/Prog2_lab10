@@ -42,7 +42,7 @@ public class SudokuMainPage extends javax.swing.JFrame {
                       controller.driveGames(boardArray);
                       Game newGame=view.getGame(level); 
                       //open game frame   
-                      SudokuGUI gameBoard=new SudokuGUI(view,newGame);
+                      SudokuGUI gameBoard=new SudokuGUI(view,newGame,false);
                       gameBoard.frame.setVisible(true);
                       this.dispose();
                      
@@ -56,7 +56,7 @@ public class SudokuMainPage extends javax.swing.JFrame {
         }else{
                Game game=view.getGame(level);
                //open game frame
-               SudokuGUI gameBoard=new SudokuGUI(view,game);
+               SudokuGUI gameBoard=new SudokuGUI(view,game,false);
                gameBoard.frame.setVisible(true);
                this.dispose();
                
@@ -177,7 +177,7 @@ public class SudokuMainPage extends javax.swing.JFrame {
            }
            Game game=view.getPreviousGame();
            //open game board and close this one
-           SudokuGUI gameBoard=new SudokuGUI(view,game);
+           SudokuGUI gameBoard=new SudokuGUI(view,game,true);
            gameBoard.frame.setVisible(true);
            this.dispose();
        }catch(NotFoundException e)

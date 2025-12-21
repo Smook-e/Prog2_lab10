@@ -28,19 +28,32 @@ public class SudokuGUI {
     private static final String INCOMPLETE_FOLDER = "incomplete";
     private SudokuView view;
     private Game currentGame;
-    public SudokuGUI(SudokuView view,Game game) {
+    public SudokuGUI(SudokuView view,Game game,boolean isContinue) {
         this.view=view;
         this.currentGame=game;
         this.puzzle=game.getBoard();
         cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
-        for(int i=0;i<9;i++)
+        if(isContinue)
+        {
+            isGiven=loadGivenForPreviousGame();
+        }else
+        {
+            for(int i=0;i<9;i++)
         {
             for(int j=0;j<9;j++)
             {
                 isGiven[i][j]=puzzle.getGrid(i, j)!=0;
             }
         }
+        }
+        /*for(int i=0;i<9;i++)
+        {
+            for(int j=0;j<9;j++)
+            {
+                isGiven[i][j]=puzzle.getGrid(i, j)!=0;
+            }
+        }*/
         /*puzzle = new SudokuBoard(new int[9][9]);*/
         /*File givenFile=new File(INCOMPLETE_FOLDER+"/givens.txt");
         if(!givenFile.exists())
@@ -61,6 +74,29 @@ public class SudokuGUI {
         updateGridUI();
         /*resetPuzzle();*/
 }
+    private boolean[][] loadGivenForPreviousGame()
+    {
+        boolean[][] given=new boolean[9][9];
+        for(int i=0;i<9;i++)
+            {
+                for(int j=0;j<9;j++)
+                {
+                    given[i][j]=puzzle.getGrid(i, j)!=0;
+                }
+            }
+        File logFile=new File("incomplete/undo.log");
+        if(!logFile.exists())return given;
+        try(BufferedReader r=new BufferedReader(new FileReader(logFile))){
+            String line;
+            while((line=r.readLine())!=null)
+            {
+                UndoLogEntry u=UndoLogEntry.fromLine(line);
+                given[u.row][u.col]=false;
+            }
+        }catch(IOException e){}
+        return given;
+    }
+    
    /* private void saveGiven()
     {
         try(BufferedWriter w=new BufferedWriter(new FileWriter(INCOMPLETE_FOLDER+"/givens.txt"))){
@@ -396,8 +432,8 @@ private void updateGridUI() {
         }else{
            JOptionPane.showMessageDialog(frame,"Invalid solution."); 
         }
-        UndoLogManager.clear("incomplete");
-        FileManager.delete("incomplete");
+        //UndoLogManager.clear("incomplete");
+        //FileManager.delete("incomplete");
     }
 
     private int[] getColumn(int[][] grid, int col) {
@@ -453,11 +489,12 @@ private void updateGridUI() {
         if("VALID".equals(verify))
         {
             JOptionPane.showMessageDialog(frame,"Congrats!!! Game completed and solution is valid.");
+            UndoLogManager.clear("incomplete");
+            FileManager.delete("incomplete");
         }else{
            JOptionPane.showMessageDialog(frame,"Game completed but solution is invalid."); 
         }
-        UndoLogManager.clear("incomplete");
-        FileManager.delete("incomplete");
+        
        //call first frame
        SwingUtilities.invokeLater(()->{
            new SudokuMainPage().setVisible(true);
