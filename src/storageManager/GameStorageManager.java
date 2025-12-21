@@ -31,7 +31,7 @@ public class GameStorageManager {
 
     public void saveCurrentGame(SudokuBoard board) {
         try {
-            FileManager.saveBoard("current", board);
+            FileManager.saveBoard("incomplete", board);
         } catch (IOException ex) {
             System.out.println("error saving game");
         }
@@ -39,7 +39,7 @@ public class GameStorageManager {
 
     public SudokuBoard loadCurrentGame() {
         try {
-            return FileManager.loadBoard("current");
+            return FileManager.loadBoard("incomplete");
         } catch (IOException ex) {
             System.out.println("error loading game");
             return null;
@@ -47,6 +47,6 @@ public class GameStorageManager {
     }
 
     public boolean hasCurrentGame() {
-        return FileManager.exists("current");
+        return FileManager.exists("incomplete");
     }
 }
