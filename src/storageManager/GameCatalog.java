@@ -13,7 +13,7 @@ public class GameCatalog {
         return FileManager.exists(DifficultyLevel.HARD.getfolderName());
     }
     public boolean hasIncomplete() {
-        return FileManager.exists("current"); 
+        return FileManager.exists("incomplete"); 
     }
     public boolean hasAllLevels() {
         return hasEasy() && hasMedium() && hasHard();
