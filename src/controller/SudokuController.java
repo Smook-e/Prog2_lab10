@@ -83,7 +83,22 @@ public class SudokuController implements Controllable {
         SudokuVerifier verifier=new SudokuVerifier(); 
         ValidationResult validationResult = verifier.validate(board);
         boolean[][] validCheck =new boolean[9][9];
+        if(!validationResult.isComplete())
+        {
+            return validCheck;
+        }
+        if(!validationResult.isValid())
+        {
+            return validCheck;
+        }
         for(int i=0;i<9;i++)
+        {
+           for(int j=0;j<9;j++)
+           {
+               validCheck[i][j]=true;
+           }
+        }
+       /* for(int i=0;i<9;i++)
         {
             for(int j=0;j<9;j++)
             {
@@ -138,7 +153,7 @@ public class SudokuController implements Controllable {
                 } 
                 
             }
-        }
+        }*/
         return validCheck;
         
     }

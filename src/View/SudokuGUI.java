@@ -32,9 +32,16 @@ public class SudokuGUI {
         this.view=view;
         this.currentGame=game;
         this.puzzle=game.getBoard();
-        /*cells = new JTextField[9][9];
+        cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
-        puzzle = new SudokuBoard(new int[9][9]);*/
+        for(int i=0;i<9;i++)
+        {
+            for(int j=0;j<9;j++)
+            {
+                isGiven[i][j]=puzzle.getGrid(i, j)!=0;
+            }
+        }
+        /*puzzle = new SudokuBoard(new int[9][9]);*/
         initializeGUI();
         updateGridUI();
         /*resetPuzzle();*/
@@ -181,8 +188,7 @@ public class SudokuGUI {
             updateGridUI();
         }
     }
-
-    private void updateGridUI() {
+private void updateGridUI() {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 JTextField cell = cells[i][j];
@@ -192,7 +198,9 @@ public class SudokuGUI {
                     cell.setBackground(new Color(230, 240, 255));
                     cell.setForeground(Color.BLACK);
                 } else {
-                    cell.setText("");
+                    //cell.setText("");
+                 int value = puzzle.getGrid(i, j); // read from board
+                cell.setText(value == 0 ? "" : String.valueOf(value));
                     cell.setEditable(true);
                     cell.setBackground(Color.WHITE);
                     cell.setForeground(Color.BLUE);
