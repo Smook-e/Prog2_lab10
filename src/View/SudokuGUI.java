@@ -11,19 +11,20 @@ import java.awt.*;
 import java.io.*;
 import java.util.Arrays;
 import solver.SudokuSolver;
+import storageManager.GameStorageManager;
 import undo.UndoLogEntry;
 import undo.UndoLogManager;
 import static undo.UndoLogManager.clear;
 
 public class SudokuGUI {
-
+    private GameStorageManager storage;
     private JFrame frame;
     private JTextField[][] cells;
     private boolean[][] isGiven;
     private SudokuBoard puzzle;
     private boolean undoing = false;
     // Folder for incomplete games
-    private static final String INCOMPLETE_FOLDER = "incomplete";
+   // private static final String INCOMPLETE_FOLDER = "incomplete";
     public SudokuGUI() {
         cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
@@ -99,14 +100,14 @@ public class SudokuGUI {
     // ==== LOGGING ====
     // Only log if value changed
     try {
-        UndoLogManager.logMove("incomplete",
+        UndoLogManager.logMove("current",
                 new UndoLogEntry(row, col,
                         puzzle.getGrid(row, col), prev));
     } catch (IOException ex) {
         System.err.println("Undo log failed");
     }
 
-    saveGameFile();
+    storage.saveCurrentGame(puzzle);
 }
 
 
@@ -258,13 +259,6 @@ JButton solveBtn = new JButton("solver");
 
     }
 ///////// SAVE BOARD TO GAME FILE 
-    private void saveGameFile() {
-        try {
-            FileManager.saveBoard(INCOMPLETE_FOLDER, puzzle); 
-        } catch (IOException ex) {
-            System.err.println("Error saving game file");
-        }
-    }
   
    private void Solution() {
     SudokuSolver solver = new SudokuSolver(puzzle);
