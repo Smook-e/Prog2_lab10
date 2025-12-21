@@ -189,7 +189,7 @@ public class SudokuMainPage extends javax.swing.JFrame {
     private void button2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button2ActionPerformed
        if(view.getCatalog().current)
            {
-               JOptionPane.showMessageDialog(this,"Couldn't find a previous game.");
+               JOptionPane.showMessageDialog(this,"finish current game first.");
                return;
            }
         newGame(DifficultyLevel.EASY);
@@ -198,7 +198,7 @@ public class SudokuMainPage extends javax.swing.JFrame {
     private void button3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button3ActionPerformed
       if(view.getCatalog().current)
            {
-               JOptionPane.showMessageDialog(this,"Couldn't find a previous game.");
+               JOptionPane.showMessageDialog(this,"finish current game first.");
                return;
            }
         newGame(DifficultyLevel.MEDIUM);
@@ -207,7 +207,7 @@ public class SudokuMainPage extends javax.swing.JFrame {
     private void button4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button4ActionPerformed
      if(view.getCatalog().current)
            {
-               JOptionPane.showMessageDialog(this,"Couldn't find a previous game.");
+               JOptionPane.showMessageDialog(this,"finish current game first.");
                return;
            }
         newGame(DifficultyLevel.HARD);
