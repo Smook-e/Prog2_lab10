@@ -7,10 +7,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author HP
- */
+
 public class ValidationResult {
 
     private boolean valid = true;

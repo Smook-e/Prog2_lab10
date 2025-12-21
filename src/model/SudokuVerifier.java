@@ -4,69 +4,98 @@
  */
 package model;
 
-/**
- *
- * @author HP
- */
+import java.util.*;
+
+
 public class SudokuVerifier {
 
-    public ValidationResult validate(SudokuBoard board) {
 
-        ValidationResult vr = new ValidationResult();
 
-        // check incomplete
-        for (int r = 0; r < 9; r++) {
-            for (int c = 0; c < 9; c++) {
-                if (board.getGrid(r, c) == 0) {
-                    vr.markIncomplete();
+
+        public ValidationResult validate(SudokuBoard board) {
+            ValidationResult result = new ValidationResult();
+
+            // Check rows
+            for (int row = 0; row < 9; row++) {
+                validateRow(board, row, result);
+            }
+
+            // Check columns
+            for (int col = 0; col < 9; col++) {
+                validateColumn(board,col, result);
+            }
+
+            // Check box
+            for (int blockRow = 0; blockRow < 3; blockRow++) {
+                for (int blockCol = 0; blockCol < 3; blockCol++) {
+                    validateSubgrid(board,blockRow * 3, blockCol * 3, result);
+                }
+            }
+
+            return result;
+        }
+
+        private void validateRow(SudokuBoard board, int row, ValidationResult result) {
+            Map<Integer, List<Integer>> seen = new HashMap<>();
+            for (int col = 0; col < 9; col++) {
+                int num = board.getGrid(row,col);
+                if (num >= 1 && num <= 9) {
+                    seen.computeIfAbsent(num, k -> new ArrayList<>()).add(col);
+                }
+            }
+            for (Map.Entry<Integer, List<Integer>> entry : seen.entrySet()) {
+                if (entry.getValue().size() > 1) {
+                    result.addError("Row" + (row + 1) + " has duplicate" + entry.getKey() + "at columns" +  entry.getValue()
+                           );
                 }
             }
         }
 
-        // rows
-        for (int r = 0; r < 9; r++) {
-            boolean[] seen = new boolean[10];
-            for (int c = 0; c < 9; c++) {
-                int v = board.getGrid(r, c);
-                if (v == 0) continue;
-                if (seen[v]) {
-                    vr.addError("ROW " + r + " DUPLICATE " + v);
+        private void validateColumn(SudokuBoard board, int col, ValidationResult result) {
+            Map<Integer, List<Integer>> seen = new HashMap<>();
+            for (int row = 0; row < 9; row++) {
+                int num = board.getGrid(row,col);
+                if (num >= 1 && num <= 9) {
+                    seen.computeIfAbsent(num, k -> new ArrayList<>()).add(row);
                 }
-                seen[v] = true;
+            }
+            for (Map.Entry<Integer, List<Integer>> entry : seen.entrySet()) {
+                if (entry.getValue().size() > 1) {
+                    result.addError("Column" + (col + 1) + " has duplicate" + entry.getKey() + "at columns" +  entry.getValue()
+                    );
+
+                }
             }
         }
 
-        // columns
-        for (int c = 0; c < 9; c++) {
-            boolean[] seen = new boolean[10];
-            for (int r = 0; r < 9; r++) {
-                int v = board.getGrid(r, c);
-                if (v == 0) continue;
-                if (seen[v]) {
-                    vr.addError("COLUMN " + c + " DUPLICATE " + v);
-                }
-                seen[v] = true;
-            }
-        }
-
-        // boxes
-        for (int box = 0; box < 9; box++) {
-            boolean[] seen = new boolean[10];
-            int startRow = (box / 3) * 3;
-            int startCol = (box % 3) * 3;
-
-            for (int r = startRow; r < startRow + 3; r++) {
-                for (int c = startCol; c < startCol + 3; c++) {
-                    int v = board.getGrid(r, c);
-                    if (v == 0) continue;
-                    if (seen[v]) {
-                        vr.addError("BOX " + box + " DUPLICATE " + v);
+        private void validateSubgrid(SudokuBoard board, int startRow, int startCol, ValidationResult result) {
+            Map<Integer, List<String>> seen = new HashMap<>();
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    int num = board.getGrid(startRow + i, startCol + j);
+                    if (num >= 1 && num <= 9) {
+                        String pos = String.format("(%d,%d)", startRow + i + 1, startCol + j + 1);
+                        seen.computeIfAbsent(num, k -> new ArrayList<>()).add(pos);
                     }
-                    seen[v] = true;
+                }
+            }
+            for (Map.Entry<Integer, List<String>> entry : seen.entrySet()) {
+                if (entry.getValue().size() > 1) {
+                    result.addError(String.format("Box (%d,%d) has duplicate %d at positions %s",
+                            startRow / 3 + 1, startCol / 3 + 1, entry.getKey(), entry.getValue()));
                 }
             }
         }
 
-        return vr;
-    }
+
+        public boolean isComplete(SudokuBoard board) {
+            if (!validate(board).isValid()) return false;
+            for (int[] row : board.getArray()) {
+                for (int cell : row) {
+                    if (cell == 0) return false;
+                }
+            }
+            return true;
+        }
 }
+
