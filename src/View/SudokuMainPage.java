@@ -25,6 +25,7 @@ public class SudokuMainPage extends javax.swing.JFrame {
     private SudokuController controller;
     public SudokuMainPage() {
         initComponents();
+        this.setLocationRelativeTo(null);
         controller=new SudokuController();
         view=new SudokuView(controller);
     }
@@ -47,7 +48,7 @@ public class SudokuMainPage extends javax.swing.JFrame {
                      
                   }catch(NotFoundException e)
                   {
-                      JOptionPane.showMessageDialog(this,"Invalid Link.");
+                      JOptionPane.showMessageDialog(this,"Error finding file 'not found'.");
                   } catch(SolutionInvalidException e){
                       JOptionPane.showMessageDialog(this,"Generated solution is invalid.");
                   }     

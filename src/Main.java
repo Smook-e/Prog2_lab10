@@ -1,3 +1,4 @@
+import View.SudokuMainPage;
 import model.SudokuBoard;
 import model.SudokuVerifier;
 import model.ValidationResult;
@@ -9,7 +10,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
+        /*//TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
         // to see how IntelliJ IDEA suggests fixing it.
 
 
@@ -80,6 +81,12 @@ public class Main {
             }
             System.out.println();
             if ((i + 1) % 3 == 0 && i != 8) System.out.println("---------------------");
-        }
+        }*/
+        
+   
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            new SudokuMainPage().setVisible(true);
+        });
+
     }
-    }
+ }
