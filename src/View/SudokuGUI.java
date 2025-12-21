@@ -221,8 +221,8 @@ JButton solveBtn = new JButton("solver");
             }
 
             // ====== RESET INCOMPLETE FOLDER 
-            UndoLogManager.clear("incomplete");      // clear undo.log
-            FileManager.saveBoard("incomplete", puzzle); // save game.txt
+            UndoLogManager.clear("current");      // clear undo.log
+            storage.saveCurrentGame(puzzle); // save game.txt
 
             updateGridUI();
 
@@ -243,7 +243,7 @@ JButton solveBtn = new JButton("solver");
     public void undo(){
 
            try {
-    UndoLogEntry e = UndoLogManager.popLast("incomplete");
+    UndoLogEntry e = UndoLogManager.popLast("current");
     if (e != null) {
         undoing = true;
         puzzle.setDigit(e.row, e.col, e.prev);
@@ -258,8 +258,6 @@ JButton solveBtn = new JButton("solver");
 
 
     }
-///////// SAVE BOARD TO GAME FILE 
-  
    private void Solution() {
     SudokuSolver solver = new SudokuSolver(puzzle);
     boolean solved = solver.solve();
@@ -304,8 +302,8 @@ JButton solveBtn = new JButton("solver");
                 }
             }
         }
-        saveGameFile(); 
-        clear("incomplete");
+        storage.saveCurrentGame(puzzle);
+        clear("current");
     }
 
     private int[][] readGrid() {
