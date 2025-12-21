@@ -187,14 +187,29 @@ public class SudokuMainPage extends javax.swing.JFrame {
     }//GEN-LAST:event_button1ActionPerformed
 
     private void button2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button2ActionPerformed
+       if(view.getCatalog().current)
+           {
+               JOptionPane.showMessageDialog(this,"Couldn't find a previous game.");
+               return;
+           }
         newGame(DifficultyLevel.EASY);
     }//GEN-LAST:event_button2ActionPerformed
 
     private void button3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button3ActionPerformed
+      if(view.getCatalog().current)
+           {
+               JOptionPane.showMessageDialog(this,"Couldn't find a previous game.");
+               return;
+           }
         newGame(DifficultyLevel.MEDIUM);
     }//GEN-LAST:event_button3ActionPerformed
 
     private void button4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button4ActionPerformed
+     if(view.getCatalog().current)
+           {
+               JOptionPane.showMessageDialog(this,"Couldn't find a previous game.");
+               return;
+           }
         newGame(DifficultyLevel.HARD);
     }//GEN-LAST:event_button4ActionPerformed
 
