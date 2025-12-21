@@ -23,8 +23,6 @@ public class SudokuGUI {
     private boolean[][] isGiven;
     private SudokuBoard puzzle;
     private boolean undoing = false;
-    // Folder for incomplete games
-   // private static final String INCOMPLETE_FOLDER = "incomplete";
     public SudokuGUI() {
         cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
