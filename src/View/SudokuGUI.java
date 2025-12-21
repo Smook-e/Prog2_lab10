@@ -34,15 +34,15 @@ public class SudokuGUI {
         this.puzzle=game.getBoard();
         cells = new JTextField[9][9];
         isGiven = new boolean[9][9];
-        /*for(int i=0;i<9;i++)
+        for(int i=0;i<9;i++)
         {
             for(int j=0;j<9;j++)
             {
                 isGiven[i][j]=puzzle.getGrid(i, j)!=0;
             }
-        }*/
+        }
         /*puzzle = new SudokuBoard(new int[9][9]);*/
-        File givenFile=new File(INCOMPLETE_FOLDER+"/givens.txt");
+        /*File givenFile=new File(INCOMPLETE_FOLDER+"/givens.txt");
         if(!givenFile.exists())
         {
             for(int i=0;i<9;i++)
@@ -56,12 +56,12 @@ public class SudokuGUI {
         }
         else{
             loadGiven();
-        }
+        }*/
         initializeGUI();
         updateGridUI();
         /*resetPuzzle();*/
 }
-    private void saveGiven()
+   /* private void saveGiven()
     {
         try(BufferedWriter w=new BufferedWriter(new FileWriter(INCOMPLETE_FOLDER+"/givens.txt"))){
             for(int i=0;i<9;i++)
@@ -92,7 +92,7 @@ public class SudokuGUI {
         {
             System.err.println("failed to load givens");
         }
-    }
+    }*/
 
     private void initializeGUI() {
         frame = new JFrame("Sudoku Board");
