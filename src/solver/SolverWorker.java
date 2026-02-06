@@ -1,56 +1,43 @@
 package solver;
 
-
-import java.util.List;
 import model.SudokuBoard;
+import java.util.List;
+
 
 public class SolverWorker extends Thread {
-
     private final SudokuBoard board;
     private final List<int[]> emptyCells;
-    private final iterator<int[]> iterator;
+    private final List<int[]> guesses;
     private final SolutionObserver observer;
+    private boolean stop = false;
 
-    private boolean stopRequested = false;
-
-    public SolverWorker(
-            SudokuBoard board,
-            List<int[]> emptyCells,
-            iterator<int[]> iterator,
-            SolutionObserver observer) {
-
+    public SolverWorker(SudokuBoard board, List<int[]> emptyCells, List<int[]> guesses, SolutionObserver observer) {
         this.board = board;
         this.emptyCells = emptyCells;
-        this.iterator = iterator;
+        this.guesses = guesses;
         this.observer = observer;
     }
 
-    public void requestStop() {
-        stopRequested = true;
-    }
+    public void stopWorker() { stop = true; }
 
     @Override
     public void run() {
-        int count = emptyCells.size();
+        for (int[] guess : guesses) {
+            if (stop) return;
 
-        while (!stopRequested && iterator.hasNext()) {
-            int[] guess = iterator.next();
-            
-            for (int i = 0; i < count; i++) {
+            // Create a temporary board copy
+            SudokuBoard temp = board.newBoard();
+
+            // Apply the guess in temp
+            for (int i = 0; i < 5; i++) {
                 int r = emptyCells.get(i)[0];
                 int c = emptyCells.get(i)[1];
-                board.setDigit(r, c, guess[i]);
+                temp.setDigit(r, c, guess[i]);
             }
 
-            if (board.isValid()) {
+            if (temp.isValid()) {
                 observer.solutionFound(guess);
                 return;
-            }
-
-            for (int i = 0; i < count; i++) {
-                int r = emptyCells.get(i)[0];
-                int c = emptyCells.get(i)[1];
-                board.clearDigit(r, c);
             }
         }
     }

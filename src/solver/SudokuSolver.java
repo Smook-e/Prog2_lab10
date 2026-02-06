@@ -1,80 +1,77 @@
 package solver;
 import java.util.ArrayList;
-import model.SudokuBoard;
-
 import java.util.List;
+import model.SudokuBoard;
 
 public class SudokuSolver implements SolutionObserver {
 
-    private final SudokuBoard originalBoard;
-    private final List<SolverWorker> workers = new ArrayList<>();
+    private final SudokuBoard board;
+    private int[] finalSolution = null;
 
-    private boolean solved = false;
-    private int[] solution;
+    private List<SolverWorker> workers = new ArrayList<>();
 
     public SudokuSolver(SudokuBoard board) {
-        this.originalBoard = board;
+        this.board = board;
     }
+
     public boolean solve() {
 
-        List<int[]> emptyCells = originalBoard.getEmptyCells();
-        if (emptyCells.size() != 5) {
+        List<int[]> empty = board.getEmptyCells();
+        if (empty.size() != 5) {
+            System.out.println("Solver works only for exactly 5 empty cells");
             return false;
         }
 
-        int totalPermutations = (int) Math.pow(9, 5); // 59049
-        int threadCount = 3;
-        int range = totalPermutations / threadCount;
+        List<int[]> all = generateAll();
+        int part = all.size() / 3;
 
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * range;
-            int end = (i == threadCount - 1)? totalPermutations - 1: (start + range - 1);
+        List<int[]> p1 = all.subList(0, part);
+        List<int[]> p2 = all.subList(part, part*2);
+        List<int[]> p3 = all.subList(part*2, all.size());
 
-            SudokuBoard workerBoard =
-                    new SudokuBoard(originalBoard.getArrayCopy());
+        workers.add(new SolverWorker(board, empty, p1, this));
+        workers.add(new SolverWorker(board, empty, p2, this));
+        workers.add(new SolverWorker(board, empty, p3, this));
 
-            iterator<int[]> iterator =
-                    new RangePermutationIterator(start, end, 5);
+        // start threads
+        for (Thread t : workers) t.start();
 
-            SolverWorker worker =
-                    new SolverWorker(workerBoard, emptyCells, iterator, this);
-
-            workers.add(worker);
-            worker.start();
+        // wait threads
+        for (Thread t : workers){
+            try { t.join(); } catch(Exception e){}
         }
 
-        for (SolverWorker w : workers) {
-            try {
-                w.join();
-            } catch (InterruptedException ignored) {}
+        // if solution found → write final once
+        if(finalSolution != null){
+            for(int i=0;i<5;i++){
+                int r = empty.get(i)[0];
+                int c = empty.get(i)[1];
+                board.setDigit(r,c, finalSolution[i]);
+            }
+            return true;
         }
 
-        if (solved) {
-            applySolution();
-        }
-
-        return solved;
+        return false;
     }
 
-    @Override
+    // generate all 9^5 guesses
+    private List<int[]> generateAll(){
+        List<int[]> list = new ArrayList<>();
+
+        for(int a=1;a<=9;a++)
+        for(int b=1;b<=9;b++)
+        for(int c=1;c<=9;c++)
+        for(int d=1;d<=9;d++)
+        for(int e=1;e<=9;e++)
+            list.add(new int[]{a,b,c,d,e});
+
+        return list;
+    }
+
+    // 🔴 OBSERVER METHOD
     public void solutionFound(int[] solution) {
-        if (solved) return;
-
-        solved = true;
-        this.solution = solution;
-
-        // stop others(notify)
-        for (SolverWorker w : workers) {
-            w.requestStop();
-        }
-    }
-
-    private void applySolution() {
-        List<int[]> emptyCells = originalBoard.getEmptyCells();
-        for (int i = 0; i < 5; i++) {
-            int r = emptyCells.get(i)[0];
-            int c = emptyCells.get(i)[1];
-            originalBoard.setDigit(r, c, solution[i]);
-        }
-    }
+    if (finalSolution != null) return; // already found
+    finalSolution = solution;
+    for (SolverWorker w : workers) w.stopWorker();
+}
 }
